@@ -1,0 +1,5 @@
+gradio==6.5.1
+spaces
+httpx>=0.27,<1
+pandas>=2.2,<3
+plotly>=5.24,<7

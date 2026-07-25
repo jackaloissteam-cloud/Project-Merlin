@@ -509,16 +509,13 @@ def build_hero(state: dict, settings: dict) -> str:
         statement = "Frances Dell is resting peacefully in the hangar."
 
     hero_image = HERO_IMAGE_URL or EMBEDDED_HERO_IMAGE
-    image_style = (
-        "background-image: linear-gradient(90deg, rgba(3,7,11,.94) 0%, rgba(3,7,11,.72) 38%, rgba(3,7,11,.14) 72%, rgba(3,7,11,.28) 100%), "
-        f"url('{hero_image}');"
-    )
     last_poll = format_time(state.get("last_poll"))
     callsign = state.get("callsign") or "–"
     icao24 = state.get("icao24") or settings.get("locked_icao24") or "–"
 
     return f"""
-    <section class="merlin-hero {mode_class}" style="{image_style}">
+    <section class="merlin-hero {mode_class}">
+      <img class="merlin-hero__image" src="{hero_image}" alt="Frances Dell P-51D Mustang" loading="eager" decoding="async">
       <div class="merlin-hero__veil"></div>
       <div class="merlin-hero__content">
         <div class="merlin-brand">FRANCES DELL <span>·</span> WHEN HISTORY COMES ALIVE</div>
@@ -705,6 +702,7 @@ CSS = """
 body,.gradio-container{background:radial-gradient(circle at top right,#18212b 0,#090d12 45%,#05070a 100%)!important;color:var(--merlin-text)!important;}
 .gradio-container{max-width:1280px!important;padding-top:0!important;} footer{display:none!important;}
 .merlin-hero{position:relative;min-height:620px;margin:0 -16px 26px;border-radius:0 0 28px 28px;overflow:hidden;background-size:cover;background-position:center;background-color:#0a1016;box-shadow:0 28px 80px rgba(0,0,0,.45);}
+.merlin-hero__image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center;z-index:0;display:block;opacity:1!important;visibility:visible!important;}
 .merlin-hero::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(circle at 78% 36%,rgba(216,169,91,.16),transparent 36%);}
 .merlin-hero::after{content:"P-51D";position:absolute;right:3%;bottom:-8%;font:900 12rem/1 Arial,sans-serif;letter-spacing:-.08em;color:rgba(255,255,255,.025);}
 .merlin-hero__veil{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(3,7,11,.78) 0%,rgba(3,7,11,.48) 38%,rgba(3,7,11,.08) 72%,rgba(3,7,11,.22) 100%),linear-gradient(180deg,rgba(0,0,0,.06),rgba(0,0,0,.34));}
@@ -715,13 +713,10 @@ body,.gradio-container{background:radial-gradient(circle at top right,#18212b 0,
 .merlin-hero h1{margin:.35rem 0 0!important;font-size:clamp(4rem,10vw,8.7rem)!important;line-height:.88!important;letter-spacing:-.055em!important;font-weight:800!important;color:#f5f0e6!important;text-shadow:0 10px 40px rgba(0,0,0,.45);}
 .merlin-subtitle{margin:.8rem 0 0;font-size:1.12rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.72);}.merlin-statement{margin:1.8rem 0 2.2rem;max-width:760px;font:400 clamp(1.25rem,2.4vw,2rem)/1.35 Georgia,serif;color:#fff;}
 .merlin-statusbar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--merlin-line);background:rgba(5,9,14,.38);backdrop-filter:blur(12px);}.merlin-statusbar>div{padding:18px 22px;border-right:1px solid var(--merlin-line);}.merlin-statusbar>div:last-child{border-right:0;}.merlin-statusbar small{display:block;margin-bottom:7px;font-size:.64rem;letter-spacing:.18em;color:var(--merlin-muted);}.merlin-statusbar strong{font-size:.92rem;color:#fff;}
-
 .merlin-passport{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1.45fr);gap:24px;margin:0 0 30px;padding:28px;border:1px solid var(--merlin-line);border-radius:24px;background:linear-gradient(145deg,rgba(18,25,33,.92),rgba(8,12,17,.96));box-shadow:0 22px 60px rgba(0,0,0,.25);}
 .merlin-passport__intro{padding:8px 18px 8px 8px;border-right:1px solid var(--merlin-line);}.merlin-kicker{font-size:.68rem;letter-spacing:.24em;font-weight:800;color:var(--merlin-amber);}.merlin-passport h2{margin:.55rem 0 .9rem!important;font-size:clamp(2rem,4vw,3.4rem)!important;line-height:.95!important;letter-spacing:-.045em!important;color:#f5f0e6!important;}.merlin-passport__intro p{margin:0;color:var(--merlin-muted);font-size:1rem;line-height:1.7;}.merlin-passport__mission{margin-top:20px;padding-top:16px;border-top:1px solid var(--merlin-line);font-size:.72rem;line-height:1.6;letter-spacing:.1em;text-transform:uppercase;color:#e7d4b3;}
 .merlin-passport__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}.merlin-passport article{min-height:90px;padding:17px 18px;border:1px solid rgba(255,255,255,.08);border-radius:16px;background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.018));display:flex;flex-direction:column;justify-content:space-between;}.merlin-passport article.wide{grid-column:1/-1;}.merlin-passport article small{font-size:.62rem;letter-spacing:.18em;color:#8f9aa5;}.merlin-passport article strong{font-size:1rem;line-height:1.25;color:#fff;}
-
 .merlin-section-title{margin:12px 0 2px!important;font-size:.72rem!important;letter-spacing:.23em!important;color:var(--merlin-amber)!important;}.gr-group,.block,.form{border-color:var(--merlin-line)!important;}button.primary{background:linear-gradient(135deg,#b88135,#e0b76f)!important;color:#111!important;border:0!important;font-weight:700!important;}
-
 .mission-center{margin:0 0 30px;padding:30px;border:1px solid var(--merlin-line);border-radius:24px;background:linear-gradient(145deg,rgba(18,25,33,.96),rgba(7,11,15,.98));box-shadow:0 22px 60px rgba(0,0,0,.28)}
 .mission-center__header{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-bottom:24px}.mission-center__header h2{margin:.45rem 0 .35rem!important;font-size:clamp(2rem,4vw,3.25rem)!important;letter-spacing:-.045em!important;color:#f5f0e6!important}.mission-center__header p{margin:0;color:var(--merlin-muted)}
 .mission-badge{display:flex;align-items:center;gap:.65rem;padding:12px 16px;border:1px solid var(--merlin-line);border-radius:999px;font-size:.7rem;font-weight:800;letter-spacing:.14em;color:#fff}.mission-badge span{width:9px;height:9px;border-radius:50%;background:#7f8890}.mission-center.airborne .mission-badge span{background:#61d98a;box-shadow:0 0 18px rgba(97,217,138,.8)}.mission-center.ground .mission-badge span{background:var(--merlin-amber);box-shadow:0 0 18px rgba(216,169,91,.7)}
@@ -755,7 +750,6 @@ button{transition:transform .2s ease,box-shadow .2s ease,filter .2s ease!importa
 .merlin-footer>div{display:flex;align-items:center;gap:12px}.merlin-footer__mark{display:grid;place-items:center;width:38px;height:38px;border:1px solid rgba(216,169,91,.45);border-radius:50%;font:700 1rem Georgia;color:var(--merlin-amber)}
 .merlin-footer strong,.merlin-footer small{display:block}.merlin-footer strong{font-size:.72rem;letter-spacing:.16em;color:#f5f0e6}.merlin-footer small{margin-top:3px;font-size:.56rem;letter-spacing:.14em}.merlin-footer p{margin:0;font:italic .9rem Georgia;color:#c9c1b2}.merlin-footer>small{grid-column:1/-1;text-align:right;opacity:.55}
 @media(max-width:760px){.merlin-version{top:49px;left:24px;right:auto}.merlin-footer{grid-template-columns:1fr}.merlin-footer p{padding-left:50px}.merlin-footer>small{text-align:left;padding-left:50px}}
-
 /* PRESENTATION EDITION V1 — PROLOGUE & HANGAR DRAMATURGY */
 .merlin-prologue{position:fixed;inset:0;z-index:9999;overflow:hidden;background:#030507;animation:prologueExit 7.4s cubic-bezier(.7,0,.2,1) forwards;pointer-events:auto}
 .merlin-prologue::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 82%,rgba(216,169,91,.12),transparent 42%),linear-gradient(180deg,#020304 0%,#06090c 70%,#0a0d10 100%)}
@@ -773,19 +767,17 @@ button{transition:transform .2s ease,box-shadow .2s ease,filter .2s ease!importa
 @keyframes hangarLight{0%,34%{opacity:0}55%{opacity:.55}100%{opacity:1}}@keyframes aircraftReveal{0%,47%{opacity:0;transform:translate(-50%,18px)}72%,100%{opacity:.78;transform:translate(-50%,0)}}
 @keyframes propellerSpin{to{transform:rotate(360deg)}}@keyframes copyFade{0%{opacity:0;transform:translateY(12px)}14%,48%{opacity:1;transform:none}72%,100%{opacity:0;transform:translateY(-8px)}}
 @keyframes prologueExit{0%,88%{opacity:1;visibility:visible}99%{opacity:0}100%{opacity:0;visibility:hidden;pointer-events:none}}
-.merlin-hero{min-height:78vh!important;border-radius:0 0 34px 34px!important}.merlin-hero::before{background:radial-gradient(circle at 73% 40%,rgba(216,169,91,.20),transparent 28%),linear-gradient(115deg,#03070b 0%,#091018 50%,#17232d 100%)!important}.merlin-hero.hangar::before{background:radial-gradient(ellipse at 74% 30%,rgba(240,191,111,.18),transparent 28%),linear-gradient(115deg,#030507 0%,#101418 54%,#261d13 100%)!important}
+.merlin-hero{min-height:78vh!important;border-radius:0 0 34px 34px!important}.merlin-hero::before{background:radial-gradient(circle at 73% 40%,rgba(216,169,91,.16),transparent 34%)!important}.merlin-hero.hangar::before{background:radial-gradient(ellipse at 74% 30%,rgba(240,191,111,.14),transparent 34%)!important}
 .merlin-hero.hangar::after{content:"HANGAR"!important;color:rgba(216,169,91,.035)!important}.merlin-statement{max-width:620px!important;font:italic clamp(1rem,1.8vw,1.3rem)/1.7 Georgia,serif!important;color:#d7d0c4!important}.merlin-brand{letter-spacing:.2em!important}.merlin-statusbar{backdrop-filter:blur(18px);background:rgba(5,9,13,.42)!important}
 .presentation-signature{font-family:Georgia,serif;font-style:italic}
 @media(max-width:760px){.merlin-prologue .prologue-copy{padding:24px}.prologue-aircraft{bottom:15%;height:74px}.propeller{width:58px;height:58px}.propeller i{left:27px;height:52px}.merlin-hero{min-height:86vh!important}}
-
-
 /* PRESENTATION EDITION V2 — FULL-SCREEN HERO & NAVIGATION TABLE */
 .gradio-container{max-width:none!important;width:100%!important;margin:0!important;padding:0!important;background:#070b10!important}
 .main,.wrap,.contain{max-width:none!important;width:100%!important}
 #component-0{padding:0!important}
 .merlin-hero{min-height:100svh!important;height:auto!important;margin:0!important;border-radius:0!important;background-position:center center!important;background-size:cover!important;box-shadow:none!important}
-.merlin-hero::before{background:linear-gradient(90deg,rgba(2,5,8,.94) 0%,rgba(2,5,8,.72) 38%,rgba(2,5,8,.12) 72%,rgba(2,5,8,.35) 100%)!important}
-.merlin-hero__veil{background:linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.16) 50%,rgba(3,6,9,.9) 100%)!important}
+.merlin-hero::before{background:linear-gradient(90deg,rgba(2,5,8,.74) 0%,rgba(2,5,8,.46) 38%,rgba(2,5,8,.04) 72%,rgba(2,5,8,.14) 100%)!important}
+.merlin-hero__veil{background:linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.08) 52%,rgba(3,6,9,.72) 100%)!important}
 .merlin-hero__content{min-height:100svh!important;padding:clamp(34px,6vw,74px) clamp(28px,8vw,120px) clamp(30px,5vw,62px)!important;justify-content:flex-end!important}
 .merlin-hero h1{max-width:1050px;font-size:clamp(4.7rem,11vw,10.8rem)!important;text-wrap:balance}
 .merlin-subtitle{font-size:clamp(.72rem,1.15vw,1rem)!important;letter-spacing:.28em!important}
@@ -807,9 +799,7 @@ button{transition:transform .2s ease,box-shadow .2s ease,filter .2s ease!importa
  .merlin-passport,.mission-center,.mission-timeline,.gradio-plot,.merlin-footer,.merlin-section-title,.gradio-row,.gradio-accordion{width:calc(100% - 22px)!important}
  .block.gradio-plot{min-height:520px!important}.js-plotly-plot,.plot-container{min-height:490px!important}
 }
-
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
-
 """
 
 with gr.Blocks(title="Project Merlin – Frances Dell") as demo:

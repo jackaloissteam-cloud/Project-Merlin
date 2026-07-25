@@ -38,6 +38,8 @@ GROUND_ALT_M = float(os.getenv("GROUND_ALT_M", "100"))
 OPENSKY_CLIENT_ID = os.getenv("OPENSKY_CLIENT_ID", "").strip()
 OPENSKY_CLIENT_SECRET = os.getenv("OPENSKY_CLIENT_SECRET", "").strip()
 OPENSKY_URL = "https://opensky-network.org/api/states/all"
+ADSBLOL_URL = "https://api.adsb.lol/v2/hex/{icao24}"
+HTTP_TIMEOUT = httpx.Timeout(25.0, connect=12.0)
 TOKEN_URL = "https://auth.opensky-network.org/auth/realms/opensky-network/protocol/openid-connect/token"
 
 # Frankfurt search box. Once a callsign is found, its ICAO24 is locked and tracked globally.
@@ -220,6 +222,55 @@ def get_token(force: bool = False) -> Optional[str]:
         return _token
 
 
+def adsblol_request(icao24: str) -> list[dict]:
+    """Primäre Datenquelle: ADSB.lol, ADS-B-Exchange-v2-kompatibles Format."""
+    headers = {"User-Agent": "Warnherr-Aircraft-Tracker-Gradio/3.3"}
+    last_error: Optional[Exception] = None
+    for attempt in range(2):
+        try:
+            response = httpx.get(
+                ADSBLOL_URL.format(icao24=icao24.lower()),
+                headers=headers,
+                timeout=HTTP_TIMEOUT,
+                follow_redirects=True,
+            )
+            response.raise_for_status()
+            return response.json().get("ac") or []
+        except Exception as exc:
+            last_error = exc
+            if attempt == 0:
+                time.sleep(1.0)
+    if last_error:
+        raise last_error
+    return []
+
+
+def adsblol_to_state(ac: dict) -> dict:
+    altitude = ac.get("alt_baro")
+    on_ground = altitude == "ground"
+    if isinstance(altitude, (int, float)):
+        baro_altitude = float(altitude) / 3.28084
+    else:
+        baro_altitude = None
+    geom = ac.get("alt_geom")
+    geo_altitude = float(geom) / 3.28084 if isinstance(geom, (int, float)) else None
+    gs = ac.get("gs")
+    velocity = float(gs) / 1.94384 if isinstance(gs, (int, float)) else None
+    vr = ac.get("baro_rate") if ac.get("baro_rate") is not None else ac.get("geom_rate")
+    vertical_rate = float(vr) / 196.8504 if isinstance(vr, (int, float)) else None
+    return {
+        "icao24": (ac.get("hex") or "").lower() or None,
+        "callsign": (ac.get("flight") or "").strip() or None,
+        "origin_country": None,
+        "longitude": ac.get("lon"), "latitude": ac.get("lat"),
+        "baro_altitude": baro_altitude, "geo_altitude": geo_altitude,
+        "on_ground": on_ground, "velocity": velocity,
+        "true_track": ac.get("track"), "vertical_rate": vertical_rate,
+        "squawk": ac.get("squawk"),
+        "registration": ac.get("r"), "aircraft_type": ac.get("t"),
+    }
+
+
 def opensky_request(params: dict) -> tuple[list, str]:
     headers = {"User-Agent": "Warnherr-Aircraft-Tracker-Gradio/3.3"}
     auth_mode = "anonymous"
@@ -246,38 +297,50 @@ def row_to_state(row: list) -> dict:
     }
 
 
-def fetch_opensky() -> tuple[Optional[dict], str, str]:
+def fetch_aircraft() -> tuple[Optional[dict], str, str]:
+    """ADSB.lol zuerst, OpenSky nur als Reserve."""
     settings = load_settings()
     label = settings["label"]
-    locked = settings.get("locked_icao24")
+    locked = (settings.get("locked_icao24") or "").lower()
+
+    adsblol_error = None
+    if locked:
+        try:
+            aircraft = adsblol_request(locked)
+            if aircraft:
+                raw = adsblol_to_state(aircraft[0])
+                return raw, "ADSB.lol", "Live-Daten über ADSB.lol empfangen"
+        except Exception as exc:
+            adsblol_error = type(exc).__name__
+
+    # Reservequelle OpenSky
     try:
         if locked:
-            rows, auth_mode = opensky_request({"icao24": locked})
+            rows, auth = opensky_request({"icao24": locked})
             if rows:
-                return row_to_state(rows[0]), auth_mode, "Live-Daten empfangen"
-            return None, auth_mode, f"Aktuell kein OpenSky-Signal für {label} (ICAO24 {locked})"
+                return row_to_state(rows[0]), f"OpenSky ({auth})", "Fallback-Live-Daten über OpenSky empfangen"
+            msg = f"Aktuell kein ADS-B-Signal für {label} (ICAO24 {locked})"
+            if adsblol_error:
+                msg += f" · ADSB.lol: {adsblol_error}"
+            return None, "ADSB.lol → OpenSky", msg
 
         aliases = {normalize(x) for x in settings.get("aliases", "").split(",") if normalize(x)}
         aliases.add(normalize(settings.get("query", "")))
-        rows, auth_mode = opensky_request(FRA_BBOX)
-        match = None
-        for row in rows:
-            callsign = normalize((row[1] or "").strip())
-            if callsign in aliases:
-                match = row
-                break
+        rows, auth = opensky_request(FRA_BBOX)
+        match = next((row for row in rows if normalize((row[1] or "").strip()) in aliases), None)
         if not match:
             shown = "/".join(sorted(a for a in aliases if a)) or settings.get("query", "")
-            return None, auth_mode, f"{shown} im Suchgebiet Frankfurt noch nicht gefunden"
+            return None, f"OpenSky ({auth})", f"{shown} im Suchgebiet Frankfurt noch nicht gefunden"
         raw = row_to_state(match)
         with db() as conn:
             conn.execute("UPDATE settings SET locked_icao24=?,updated_at=? WHERE id=1", (raw["icao24"], now_iso()))
         add_event("target_locked", raw, f"{label} gefunden – ICAO24 {raw['icao24']} gespeichert")
-        return raw, auth_mode, f"Callsign gefunden; ICAO24 {raw['icao24']} automatisch gespeichert"
+        return raw, f"OpenSky ({auth})", f"Callsign gefunden; ICAO24 {raw['icao24']} gespeichert"
     except httpx.HTTPStatusError as exc:
-        return None, "oauth2" if OPENSKY_CLIENT_ID else "anonymous", f"OpenSky HTTP-Fehler {exc.response.status_code}"
+        return None, "ADSB.lol → OpenSky", f"Beide Quellen ohne Live-Daten · OpenSky HTTP {exc.response.status_code}"
     except Exception as exc:
-        return None, "oauth2" if OPENSKY_CLIENT_ID else "anonymous", f"OpenSky derzeit nicht erreichbar: {type(exc).__name__}"
+        suffix = f" · ADSB.lol: {adsblol_error}" if adsblol_error else ""
+        return None, "ADSB.lol → OpenSky", f"Datenquellen derzeit nicht erreichbar: {type(exc).__name__}{suffix}"
 
 
 def derive_in_flight(raw: dict) -> bool:
@@ -294,7 +357,7 @@ def poll_once() -> dict:
     with lock:
         previous = load_state()
         settings = load_settings()
-        raw, auth_mode, message = fetch_opensky()
+        raw, auth_mode, message = fetch_aircraft()
         timestamp = now_iso()
         if raw is None:
             if previous.get("has_signal"):
@@ -310,7 +373,7 @@ def poll_once() -> dict:
         if lat is not None and lon is not None:
             position = f"{lat:.4f}, {lon:.4f}"
         state = {
-            "icao24": raw.get("icao24"), "tail": settings["label"], "aircraft_type": "Aircraft",
+            "icao24": raw.get("icao24"), "tail": settings["label"], "aircraft_type": raw.get("aircraft_type") or "Aircraft",
             "callsign": raw.get("callsign"), "latitude": lat, "longitude": lon,
             "baro_altitude": raw.get("baro_altitude"), "geo_altitude": raw.get("geo_altitude"),
             "velocity": raw.get("velocity"), "true_track": raw.get("true_track"),
@@ -394,7 +457,7 @@ def dashboard(last_seen_event: int, force_poll: bool = False):
 ### {status}
 
 **Flugzeug:** {settings['label']} · **ICAO24:** `{state.get('icao24') or settings.get('locked_icao24') or 'wird gesucht'}` · **Callsign:** {state.get('callsign') or '–'}  
-**Signal:** {'✅ vorhanden' if state.get('has_signal') else '❌ nicht vorhanden'} · **OpenSky:** {state.get('auth_mode') or 'anonymous'}  
+**Signal:** {'✅ vorhanden' if state.get('has_signal') else '❌ aktuell nicht vorhanden'} · **Datenquelle:** {state.get('auth_mode') or '–'}  
 **Höhe:** {fmt(state.get('baro_altitude'), 3.28084, 'ft')} · **Geschwindigkeit:** {fmt(state.get('velocity'), 1.94384, 'kt')}  
 **Kurs:** {fmt(state.get('true_track'), 1, '°')} · **Steigen/Sinken:** {fmt(state.get('vertical_rate'), 196.8504, 'ft/min')}  
 **Position:** {state.get('last_position') or '–'}  
@@ -463,7 +526,7 @@ def polling_loop() -> None:
         time.sleep(POLL_INTERVAL)
 
 
-threading.Thread(target=polling_loop, name="opensky-poller", daemon=True).start()
+threading.Thread(target=polling_loop, name="aircraft-poller", daemon=True).start()
 
 CSS = """
 .gradio-container {max-width: 1100px !important;}
@@ -471,8 +534,8 @@ CSS = """
 footer {display:none !important;}
 """
 
-with gr.Blocks(title="D-AIXA Aircraft Tracking Test") as demo:
-    gr.Markdown(f"# ✈️ D-AIXA Tracking-Test\nICAO24 `3C6701` · Abfrage alle {POLL_INTERVAL} Sekunden", elem_id="title")
+with gr.Blocks(title="D-AIXA Aircraft Tracking Test V3.3") as demo:
+    gr.Markdown(f"# ✈️ D-AIXA Tracking-Test V3.3\nADSB.lol → OpenSky-Fallback · ICAO24 `3C6701` · Abfrage alle {POLL_INTERVAL} Sekunden", elem_id="title")
     last_event = gr.State(0)
 
     with gr.Group():

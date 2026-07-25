@@ -751,8 +751,16 @@ button{transition:transform .2s ease,box-shadow .2s ease,filter .2s ease!importa
 .merlin-footer strong,.merlin-footer small{display:block}.merlin-footer strong{font-size:.72rem;letter-spacing:.16em;color:#f5f0e6}.merlin-footer small{margin-top:3px;font-size:.56rem;letter-spacing:.14em}.merlin-footer p{margin:0;font:italic .9rem Georgia;color:#c9c1b2}.merlin-footer>small{grid-column:1/-1;text-align:right;opacity:.55}
 @media(max-width:760px){.merlin-version{top:49px;left:24px;right:auto}.merlin-footer{grid-template-columns:1fr}.merlin-footer p{padding-left:50px}.merlin-footer>small{text-align:left;padding-left:50px}}
 /* PRESENTATION EDITION V1 — PROLOGUE & HANGAR DRAMATURGY */
-.merlin-prologue{position:fixed;inset:0;z-index:9999;overflow:hidden;background:#030507;animation:prologueExit 7.4s cubic-bezier(.7,0,.2,1) forwards;pointer-events:auto}
-.merlin-prologue::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 82%,rgba(216,169,91,.12),transparent 42%),linear-gradient(180deg,#020304 0%,#06090c 70%,#0a0d10 100%)}
+.merlin-prologue{
+    position:fixed;
+    inset:0;
+    z-index:9999;
+    overflow:hidden;
+    background:#030507;
+    animation:prologueExit 5.2s ease forwards;
+    pointer-events:none;
+    animation-fill-mode:forwards;
+}.merlin-prologue::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 82%,rgba(216,169,91,.12),transparent 42%),linear-gradient(180deg,#020304 0%,#06090c 70%,#0a0d10 100%)}
 .hangar-light{position:absolute;left:50%;top:8%;width:48vw;height:92vh;transform:translateX(-50%);clip-path:polygon(42% 0,58% 0,100% 100%,0 100%);background:linear-gradient(180deg,rgba(255,239,193,.18),rgba(216,169,91,.04) 58%,transparent);filter:blur(2px);opacity:0;animation:hangarLight 6.8s ease forwards}
 .hangar-door{position:absolute;top:0;width:51%;height:100%;background:repeating-linear-gradient(90deg,#0b0f13 0 3px,#11171d 3px 8px,#080c10 8px 11px);box-shadow:inset 0 0 80px rgba(0,0,0,.85);animation-duration:6.6s;animation-timing-function:cubic-bezier(.65,0,.2,1);animation-fill-mode:forwards}
 .door-left{left:0;border-right:1px solid rgba(216,169,91,.18);animation-name:doorLeftOpen}.door-right{right:0;border-left:1px solid rgba(216,169,91,.18);animation-name:doorRightOpen}
@@ -766,7 +774,23 @@ button{transition:transform .2s ease,box-shadow .2s ease,filter .2s ease!importa
 @keyframes doorLeftOpen{0%,39%{transform:none}88%,100%{transform:translateX(-96%)}}@keyframes doorRightOpen{0%,39%{transform:none}88%,100%{transform:translateX(96%)}}
 @keyframes hangarLight{0%,34%{opacity:0}55%{opacity:.55}100%{opacity:1}}@keyframes aircraftReveal{0%,47%{opacity:0;transform:translate(-50%,18px)}72%,100%{opacity:.78;transform:translate(-50%,0)}}
 @keyframes propellerSpin{to{transform:rotate(360deg)}}@keyframes copyFade{0%{opacity:0;transform:translateY(12px)}14%,48%{opacity:1;transform:none}72%,100%{opacity:0;transform:translateY(-8px)}}
-@keyframes prologueExit{0%,88%{opacity:1;visibility:visible}99%{opacity:0}100%{opacity:0;visibility:hidden;pointer-events:none}}
+@keyframes prologueExit{
+    0%,82%{
+        opacity:1;
+        visibility:visible;
+    }
+
+    99%{
+        opacity:0;
+        visibility:visible;
+    }
+
+    100%{
+        opacity:0;
+        visibility:hidden;
+        display:none;
+    }
+}
 .merlin-hero{min-height:78vh!important;border-radius:0 0 34px 34px!important}.merlin-hero::before{background:radial-gradient(circle at 73% 40%,rgba(216,169,91,.16),transparent 34%)!important}.merlin-hero.hangar::before{background:radial-gradient(ellipse at 74% 30%,rgba(240,191,111,.14),transparent 34%)!important}
 .merlin-hero.hangar::after{content:"HANGAR"!important;color:rgba(216,169,91,.035)!important}.merlin-statement{max-width:620px!important;font:italic clamp(1rem,1.8vw,1.3rem)/1.7 Georgia,serif!important;color:#d7d0c4!important}.merlin-brand{letter-spacing:.2em!important}.merlin-statusbar{backdrop-filter:blur(18px);background:rgba(5,9,13,.42)!important}
 .presentation-signature{font-family:Georgia,serif;font-style:italic}

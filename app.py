@@ -828,15 +828,6 @@ button{transition:transform .2s ease,box-shadow .2s ease,filter .2s ease!importa
 
 with gr.Blocks(title="Project Merlin – Frances Dell") as demo:
     gr.HTML(build_prologue())
-    hero_html = gr.HTML()
-    last_event = gr.State(0)
-
-    # The live experience follows the hero; technical controls stay out of the opening scene.
-    mission_html = gr.HTML()
-    gr.Markdown("### NAVIGATION TABLE", elem_classes=["merlin-section-title"])
-    map_plot = gr.Plot()
-    passport_html = gr.HTML()
-    timeline_html = gr.HTML()
 
     with gr.Accordion("Operations Center · Test & Technik", open=False, elem_classes=["merlin-ops-accordion"]):
         with gr.Row():
@@ -848,6 +839,18 @@ with gr.Blocks(title="Project Merlin – Frances Dell") as demo:
         target_md = gr.Markdown()
         with gr.Accordion("Technisches Ereignisprotokoll", open=False):
             event_table = gr.Dataframe(interactive=False, wrap=True)
+            
+    hero_html = gr.HTML()
+    last_event = gr.State(0)
+
+    # The live experience follows the hero; technical controls stay out of the opening scene.
+    mission_html = gr.HTML()
+    gr.Markdown("### NAVIGATION TABLE", elem_classes=["merlin-section-title"])
+    map_plot = gr.Plot()
+    passport_html = gr.HTML()
+    timeline_html = gr.HTML()
+
+    
 
     footer_html = gr.HTML()
     timer = gr.Timer(value=max(15, min(POLL_INTERVAL, 60)), active=True)

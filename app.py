@@ -813,8 +813,8 @@ button{transition:transform .2s ease,box-shadow .2s ease,filter .2s ease!importa
 .js-plotly-plot,.plot-container{min-height:680px!important}
 .merlin-section-title{margin-top:56px!important}
 .merlin-ops-accordion{margin-top:36px!important;margin-bottom:30px!important}
-.merlin-prologue{animation-duration:5.2s!important}
-.hangar-door{animation-duration:4.6s!important}.hangar-light{animation-duration:4.8s!important}.prologue-copy{animation-duration:4.2s!important}.prologue-aircraft{animation-duration:4.5s!important}
+.merlin-prologue{animation-duration:7.2s!important}
+.hangar-door{animation-duration:6.6s!important}.hangar-light{animation-duration:6.1s!important}.prologue-copy{animation-duration:4.2s!important}.prologue-aircraft{animation-duration:6.3s!important}
 @keyframes prologueExit{0%,84%{opacity:1;visibility:visible}98%{opacity:0}100%{opacity:0;visibility:hidden;pointer-events:none}}
 @media(max-width:760px){
  .merlin-hero__content{padding:36px 22px 24px!important}

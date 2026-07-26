@@ -503,7 +503,7 @@ def build_hero(state: dict, settings: dict) -> str:
         status = "RESTING IN HANGAR"
         statement = "Frances Dell is resting peacefully in the hangar."
 
-    hero_image = HERO_IMAGE_URL or EMBEDDED_HERO_IMAGE
+    hero_image = HERO_IMAGE_URL
     last_poll = format_time(state.get("last_poll"))
     callsign = state.get("callsign") or "–"
     icao24 = state.get("icao24") or settings.get("locked_icao24") or "–"

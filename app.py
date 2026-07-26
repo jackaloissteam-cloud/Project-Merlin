@@ -8,6 +8,7 @@ import time
 import wave
 import httpx
 import spaces
+import gradio as gr
 
 from datetime import datetime, timedelta, timezone
 from pathlib import Path

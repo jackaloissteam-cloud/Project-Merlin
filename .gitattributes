@@ -35,3 +35,4 @@ saved_model/**/* filter=lfs diff=lfs merge=lfs -text
 *tfevents* filter=lfs diff=lfs merge=lfs -text
 IMG_0896.PNG filter=lfs diff=lfs merge=lfs -text
 hero.jpg filter=lfs diff=lfs merge=lfs -text
+hero.png filter=lfs diff=lfs merge=lfs -text

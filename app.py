@@ -7,6 +7,7 @@ import threading
 import time
 import wave
 import httpx
+import spaces
 
 from datetime import datetime, timedelta, timezone
 from pathlib import Path

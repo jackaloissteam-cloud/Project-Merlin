@@ -1,16 +1,13 @@
-from __future__ import annotations
-
 import math
 import os
 import sqlite3
 import threading
 import time
 import wave
+import httpx
+
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-import os
-
-ROOT = Path(__file__).parent
 
 DB_PATH = Path(os.getenv("DB_PATH", ROOT / "tracker.db"))
 BEEP_PATH = ROOT / "alarm.wav"

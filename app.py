@@ -847,6 +847,11 @@ with gr.Blocks(title="Project Merlin – Frances Dell") as demo:
 
 if __name__ == "__main__":
     demo.queue(default_concurrency_limit=4).launch(
-        server_name="0.0.0.0", server_port=7860, show_error=True, ssr_mode=False, css=CSS
+        server_name="0.0.0.0",
+        server_port=7860,
+        show_error=True,
+        ssr_mode=False,
+        css=CSS,
+        allowed_paths=[str(ROOT)]
     )
 

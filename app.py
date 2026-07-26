@@ -1,3 +1,16 @@
+import math
+import os
+import sqlite3
+import threading
+import time
+import wave
+import base64
+import httpx
+import spaces
+import gradio as gr
+import plotly.graph_objects as go
+import pandas as pd
+
 ROOT = Path(__file__).parent
 
 gr.set_static_paths(paths=[ROOT])
@@ -13,9 +26,13 @@ POLL_INTERVAL = max(
 HERO_IMAGE_URL = "/gradio_api/file=hero.png"
 EMBEDDED_HERO_IMAGE = ""
 
+TAKEOFF_SPEED_KNOTS = float(
+    os.getenv("TAKEOFF_SPEED_KNOTS", "40")
+)
 
-TAKEOFF_SPEED_KNOTS = float(os.getenv("TAKEOFF_SPEED_KNOTS", "40"))
-GROUND_ALT_M = float(os.getenv("GROUND_ALT_M", "100"))
+GROUND_ALT_M = float(
+    os.getenv("GROUND_ALT_M", "100")
+)
 
 APP_VERSION = "PRESENTATION EDITION V2.1"
 

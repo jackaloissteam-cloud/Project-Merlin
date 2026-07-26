@@ -7,10 +7,18 @@ import wave
 import httpx
 
 from datetime import datetime, timedelta, timezone
-from pathlib import Path
+
+
+ROOT = Path(__file__).parent
 
 DB_PATH = Path(os.getenv("DB_PATH", ROOT / "tracker.db"))
 BEEP_PATH = ROOT / "alarm.wav"
+from pathlib import Path
+
+
+
+
+
 
 POLL_INTERVAL = max(
     15,

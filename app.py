@@ -43,6 +43,13 @@ ADSBLOL_URL = "https://api.adsb.lol/v2/hex/{icao24}"
 HTTP_TIMEOUT = httpx.Timeout(25.0, connect=12.0)
 TOKEN_URL = "https://auth.opensky-network.org/auth/realms/opensky-network/protocol/openid-connect/token"
 
+OPENSKY_CLIENT_ID = os.getenv("OPENSKY_CLIENT_ID", "").strip()
+OPENSKY_CLIENT_SECRET = os.getenv("OPENSKY_CLIENT_SECRET", "").strip()
+OPENSKY_URL = "https://opensky-network.org/api/states/all"
+ADSBLOL_URL = "https://api.adsb.lol/v2/hex/{icao24}"
+HTTP_TIMEOUT = httpx.Timeout(25.0, connect=12.0)
+TOKEN_URL = "https://auth.opensky-network.org/auth/realms/opensky-network/protocol/openid-connect/token"
+
 # Frankfurt search box. Once a callsign is found, its ICAO24 is locked and tracked globally.
 FRA_BBOX = {"lamin": 48.5, "lamax": 51.5, "lomin": 6.5, "lomax": 10.5}
 PRESETS = {

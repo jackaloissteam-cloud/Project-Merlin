@@ -11,6 +11,8 @@ import spaces
 import gradio as gr
 import plotly.graph_objects as go
 import pandas as pd
+import base64
+
 
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -30,10 +32,19 @@ POLL_INTERVAL = max(
     min(600, int(os.getenv("POLL_INTERVAL_SECONDS", "60")))
 )
 
-HERO_IMAGE_URL = os.getenv(
-    "HERO_IMAGE_URL",
-    f"/gradio_api/file={ROOT / 'hero.png'}"
-).strip()
+HERO_FILE = ROOT / "hero.png"
+
+if HERO_FILE.exists():
+
+    hero_base64 = base64.b64encode(HERO_FILE.read_bytes()).decode("utf-8")
+
+    HERO_IMAGE_URL = f"data:image/png;base64,{hero_base64}"
+
+else:
+
+    HERO_IMAGE_URL = ""
+
+EMBEDDED_HERO_IMAGE = ""
 
 # Base64-Bild wird nicht mehr verwendet
 EMBEDDED_HERO_IMAGE = ""

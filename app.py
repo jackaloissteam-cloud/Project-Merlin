@@ -32,7 +32,7 @@ POLL_INTERVAL = max(
 
 HERO_IMAGE_URL = os.getenv(
     "HERO_IMAGE_URL",
-    "/gradio_api/file=hero.jpg"
+    "/gradio_api/file=hero.png"
 ).strip()
 
 # Base64-Bild wird nicht mehr verwendet

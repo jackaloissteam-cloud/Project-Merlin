@@ -9,6 +9,7 @@ import wave
 import httpx
 import spaces
 import gradio as gr
+import plotly.graph_objects as go
 
 from datetime import datetime, timedelta, timezone
 from pathlib import Path

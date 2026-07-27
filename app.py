@@ -517,7 +517,11 @@ def build_hero(state: dict, settings: dict) -> str:
     icao24 = state.get("icao24") or settings.get("locked_icao24") or "–"
 
     return f"""
-    <section class="merlin-hero {mode_class}">
+<div style="background:red;color:white;font-size:48px;padding:40px;z-index:99999;position:relative;">
+TEST HERO WIRD ANGEZEIGT
+</div>
+
+<section class="merlin-hero {mode_class}">
       <img class="merlin-hero__image" src="{hero_image}" alt="Frances Dell P-51D Mustang" loading="eager" decoding="async">
       <div class="merlin-hero__veil"></div>
       <div class="merlin-hero__content">
